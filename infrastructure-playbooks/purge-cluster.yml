@@ -222,14 +222,14 @@
             name: "{{ item }}"
             state: absent
           with_items:
-            - /etc/grafana/dashboards
-            - /etc/grafana/grafana.ini
-            - /etc/grafana/provisioning
-            - /var/lib/grafana
-            - /etc/alertmanager
-            - /var/lib/alertmanager
-            - /var/lib/prometheus
-            - /etc/prometheus
+            - "{{ grafana_conf_dir }}/dashboards"
+            - "{{ grafana_conf_dir }}/grafana.ini"
+            - "{{ grafana_conf_dir }}/provisioning"
+            - "{{ grafana_data_dir }}"
+            - "{{ alertmanager_conf_dir }}"
+            - "{{ alertmanager_data_dir }}"
+            - "{{ prometheus_data_dir }}"
+            - "{{ prometheus_conf_dir }}"
           failed_when: false
       when: dashboard_enabled | bool
 

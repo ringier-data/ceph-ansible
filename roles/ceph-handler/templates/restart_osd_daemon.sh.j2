@@ -9,14 +9,17 @@ check_pgs() {
     return 0
   fi
   while [ $RETRIES -ne 0 ]; do
-    test "$($container_exec ceph $CEPH_CLI -s -f json | "{{ discovered_interpreter_python }}" -c 'import sys, json; print(json.load(sys.stdin)["pgmap"]["num_pgs"])')" -eq "$($container_exec ceph $CEPH_CLI -s -f json | "{{ discovered_interpreter_python }}" -c 'import sys, json; print(sum ( [ i["count"] for i in json.load(sys.stdin)["pgmap"]["pgs_by_state"] if "active+clean" in i["state_name"]]))')"
+    # [NOTE-zw] here we apply a work around. Ideally we should wait until the state becomes "active+clean". However, for the initial
+    # deployment we have only two OSD device in the cluster. The best status will be "active+undersized" and will never become
+    # "active+clean", so...
+    test "$($container_exec ceph $CEPH_CLI -s -f json | "{{ discovered_interpreter_python }}" -c 'import sys, json; print(json.load(sys.stdin)["pgmap"]["num_pgs"])')" -eq "$($container_exec ceph $CEPH_CLI -s -f json | "{{ discovered_interpreter_python }}" -c 'import sys, json; print(sum ( [ i["count"] for i in json.load(sys.stdin)["pgmap"]["pgs_by_state"] if "active+" in i["state_name"]]))')"
     RET=$?
     test $RET -eq 0 && return 0
     sleep $DELAY
     let RETRIES=RETRIES-1
   done
   # PGs not clean, exiting with return code 1
-  echo "Error while running 'ceph $CEPH_CLI -s', PGs were not reported as active+clean"
+  echo "Error while running 'ceph $CEPH_CLI -s', PGs were not reported as active+*"
   echo "It is possible that the cluster has less OSDs than the replica configuration"
   echo "Will refuse to continue"
   $container_exec ceph $CEPH_CLI -s

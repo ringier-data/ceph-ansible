@@ -10,10 +10,10 @@ After=network.target
 [Service]
 {% if container_binary == 'podman' %}
 ExecStartPre=-/usr/bin/rm -f /%t/%n-pid /%t/%n-cid
-ExecStartPre=-/usr/bin/{{ container_binary }} rm --storage ceph-crash-%i
+ExecStartPre=-/snap/bin/docker rm --storage ceph-crash-%i
 {% endif %}
-ExecStartPre=-/usr/bin/{{ container_binary }} rm -f ceph-crash-%i
-ExecStart=/usr/bin/{{ container_binary }} run --rm --name ceph-crash-%i \
+ExecStartPre=-/snap/bin/docker rm -f ceph-crash-%i
+ExecStart=/snap/bin/docker run --rm --name ceph-crash-%i \
 {% if container_binary == 'podman' %}
 -d --log-driver journald --conmon-pidfile /%t/%n-pid --cidfile /%t/%n-cid \
 {% endif %}
@@ -23,9 +23,9 @@ ExecStart=/usr/bin/{{ container_binary }} run --rm --name ceph-crash-%i \
 -v /etc/ceph:/etc/ceph:z \
 --entrypoint=/usr/bin/ceph-crash {{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}
 {% if container_binary == 'podman' %}
-ExecStop=-/usr/bin/sh -c "/usr/bin/{{ container_binary }} rm -f `cat /%t/%n-cid`"
+ExecStop=-/usr/bin/sh -c "/snap/bin/docker rm -f `cat /%t/%n-cid`"
 {% else %}
-ExecStop=-/usr/bin/{{ container_binary }} stop ceph-crash-%i
+ExecStop=-/snap/bin/docker stop ceph-crash-%i
 {% endif %}
 StartLimitInterval=10min
 StartLimitBurst=30

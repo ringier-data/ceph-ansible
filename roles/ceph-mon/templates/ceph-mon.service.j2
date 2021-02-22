@@ -11,13 +11,13 @@ After=network.target
 EnvironmentFile=-/etc/environment
 {% if container_binary == 'podman' %}
 ExecStartPre=-/usr/bin/rm -f /%t/%n-pid /%t/%n-cid
-ExecStartPre=-/usr/bin/{{ container_binary }} rm --storage ceph-mon-%i
+ExecStartPre=-/snap/bin/docker rm --storage ceph-mon-%i
 {% else %}
-ExecStartPre=-/usr/bin/{{ container_binary }} stop ceph-mon-%i
+ExecStartPre=-/snap/bin/docker stop ceph-mon-%i
 {% endif %}
-ExecStartPre=-/usr/bin/{{ container_binary }} rm ceph-mon-%i
+ExecStartPre=-/snap/bin/docker rm ceph-mon-%i
 ExecStartPre=/bin/sh -c '"$(command -v mkdir)" -p /etc/ceph /var/lib/ceph/mon'
-ExecStart=/usr/bin/{{ container_binary }} run --rm --name ceph-mon-%i \
+ExecStart=/snap/bin/docker run --rm --name ceph-mon-%i \
 {% if container_binary == 'podman' %}
   -d --log-driver journald --conmon-pidfile /%t/%n-pid --cidfile /%t/%n-cid \
 {% endif %}
@@ -48,9 +48,9 @@ ExecStart=/usr/bin/{{ container_binary }} run --rm --name ceph-mon-%i \
   {{ ceph_mon_docker_extra_env }} \
   {{ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}
 {% if container_binary == 'podman' %}
-ExecStop=-/usr/bin/sh -c "/usr/bin/{{ container_binary }} rm -f `cat /%t/%n-cid`"
+ExecStop=-/usr/bin/sh -c "/snap/bin/docker rm -f `cat /%t/%n-cid`"
 {% else %}
-ExecStop=-/usr/bin/{{ container_binary }} stop ceph-mon-%i
+ExecStop=-/snap/bin/docker stop ceph-mon-%i
 {% endif %}
 ExecStopPost=-/bin/rm -f /var/run/ceph/{{ cluster }}-mon.{{ monitor_name }}.asok
 KillMode=none
