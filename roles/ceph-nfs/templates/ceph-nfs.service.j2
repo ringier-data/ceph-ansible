@@ -12,11 +12,11 @@ After=network.target
 EnvironmentFile=-/etc/environment
 {% if container_binary == 'podman' %}
 ExecStartPre=-/usr/bin/rm -f /%t/%n-pid /%t/%n-cid
-ExecStartPre=-/snap/bin/docker rm --storage ceph-nfs-%i
+ExecStartPre=-/usr/bin/docker rm --storage ceph-nfs-%i
 {% endif %}
-ExecStartPre=-/snap/bin/docker rm ceph-nfs-%i
+ExecStartPre=-/usr/bin/docker rm ceph-nfs-%i
 ExecStartPre={{ '/bin/mkdir' if ansible_os_family == 'Debian' else '/usr/bin/mkdir' }} -p /etc/ceph /etc/ganesha /var/lib/nfs/ganesha /var/log/ganesha
-ExecStart=/snap/bin/docker run --rm --net=host \
+ExecStart=/usr/bin/docker run --rm --net=host \
 {% if container_binary == 'podman' %}
   -d --log-driver journald --conmon-pidfile /%t/%n-pid --cidfile /%t/%n-cid \
 {% endif %}
@@ -39,9 +39,9 @@ ExecStart=/snap/bin/docker run --rm --net=host \
   --name=ceph-nfs-{{ ceph_nfs_service_suffix | default(ansible_hostname) }} \
   {{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}
 {% if container_binary == 'podman' %}
-ExecStop=-/usr/bin/sh -c "/snap/bin/docker rm -f `cat /%t/%n-cid`"
+ExecStop=-/usr/bin/sh -c "/usr/bin/docker rm -f `cat /%t/%n-cid`"
 {% else %}
-ExecStopPost=-/snap/bin/docker stop ceph-nfs-%i
+ExecStopPost=-/usr/bin/docker stop ceph-nfs-%i
 {% endif %}
 KillMode=none
 Restart=always

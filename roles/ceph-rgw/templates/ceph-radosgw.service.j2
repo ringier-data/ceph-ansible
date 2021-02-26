@@ -12,12 +12,12 @@ After=network.target
 EnvironmentFile=/var/lib/ceph/radosgw/{{ cluster }}-%i/EnvironmentFile
 {% if container_binary == 'podman' %}
 ExecStartPre=-/usr/bin/rm -f /%t/%n-pid /%t/%n-cid
-ExecStartPre=-/snap/bin/docker rm --storage ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
+ExecStartPre=-/usr/bin/docker rm --storage ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
 {% else %}
-ExecStartPre=-/snap/bin/docker stop ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
+ExecStartPre=-/usr/bin/docker stop ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
 {% endif %}
-ExecStartPre=-/snap/bin/docker rm ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
-ExecStart=/snap/bin/docker run --rm --net=host \
+ExecStartPre=-/usr/bin/docker rm ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
+ExecStart=/usr/bin/docker run --rm --net=host \
 {% if container_binary == 'podman' %}
   -d --log-driver journald --conmon-pidfile /%t/%n-pid --cidfile /%t/%n-cid \
 {% endif %}
@@ -48,9 +48,9 @@ ExecStart=/snap/bin/docker run --rm --net=host \
   {{ ceph_rgw_docker_extra_env }} \
   {{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}
 {% if container_binary == 'podman' %}
-ExecStop=-/usr/bin/sh -c "/snap/bin/docker rm -f `cat /%t/%n-cid`"
+ExecStop=-/usr/bin/sh -c "/usr/bin/docker rm -f `cat /%t/%n-cid`"
 {% else %}
-ExecStopPost=-/snap/bin/docker stop ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
+ExecStopPost=-/usr/bin/docker stop ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
 {% endif %}
 KillMode=none
 Restart=always

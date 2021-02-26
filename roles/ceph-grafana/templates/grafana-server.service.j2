@@ -1,13 +1,14 @@
 # This file is managed by ansible, don't make changes here - they will be overwritten.
 [Unit]
 Description=grafana-server
-After=network.target
+After=docker.service
+Requires=docker.service
 
 [Service]
 EnvironmentFile=-/etc/environment
-ExecStartPre=-/bin/sh -c "/snap/bin/docker stop grafana-server > /dev/null 2>&1"
-ExecStartPre=-/bin/sh -c "/snap/bin/docker rm grafana-server > /dev/null 2>&1"
-ExecStart=/snap/bin/docker run --rm --name=grafana-server \
+ExecStartPre=-/bin/sh -c "/usr/bin/docker stop grafana-server > /dev/null 2>&1"
+ExecStartPre=-/bin/sh -c "/usr/bin/docker rm grafana-server > /dev/null 2>&1"
+ExecStart=/usr/bin/docker run --rm --name=grafana-server \
   -v "{{ grafana_conf_dir }}:/etc/grafana:Z" \
   -v "{{ grafana_data_dir }}:/var/lib/grafana:Z" \
   --net=host \
@@ -17,7 +18,7 @@ ExecStart=/snap/bin/docker run --rm --name=grafana-server \
   --memory-swap={{ grafana_container_memory * 2 }}GB \
   -e GF_INSTALL_PLUGINS={{ grafana_plugins|join(',') }} \
   {{ grafana_container_image }}
-ExecStop=-/snap/bin/docker stop grafana-server
+ExecStop=-/usr/bin/docker stop grafana-server
 KillMode=none
 Restart=always
 RestartSec=10s

@@ -2,12 +2,13 @@
 
 [Unit]
 Description=prometheus
-After=network.target
+After=docker.service
+Requires=docker.service
 
 [Service]
 EnvironmentFile=-/etc/environment
-ExecStartPre=-/bin/sh -c "/snap/bin/docker rm -f prometheus > /dev/null 2>&1"
-ExecStart=/snap/bin/docker run --rm --name=prometheus \
+ExecStartPre=-/bin/sh -c "/usr/bin/docker rm -f prometheus > /dev/null 2>&1"
+ExecStart=/usr/bin/docker run --rm --name=prometheus \
   -v "{{ prometheus_conf_dir }}:/etc/prometheus:Z" \
   -v "{{ prometheus_data_dir }}:/prometheus:Z" \
   --net=host \
@@ -21,7 +22,7 @@ ExecStart=/snap/bin/docker run --rm --name=prometheus \
   --storage.tsdb.path=/prometheus \
   --web.external-url=http://{{ ansible_fqdn }}:{{ prometheus_port }}/ \
   --web.listen-address={{ grafana_server_addr }}:{{ prometheus_port }}
-ExecStop=/snap/bin/docker stop prometheus
+ExecStop=/usr/bin/docker stop prometheus
 KillMode=none
 Restart=always
 RestartSec=10s

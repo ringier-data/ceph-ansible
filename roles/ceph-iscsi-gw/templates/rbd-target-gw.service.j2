@@ -11,12 +11,12 @@ After=network.target
 EnvironmentFile=-/etc/environment
 {% if container_binary == 'podman' %}
 ExecStartPre=-/usr/bin/rm -f /%t/%n-pid /%t/%n-cid
-ExecStartPre=-/snap/bin/docker rm --storage rbd-target-gw
+ExecStartPre=-/usr/bin/docker rm --storage rbd-target-gw
 {% else %}
-ExecStartPre=-/snap/bin/docker stop rbd-target-gw
+ExecStartPre=-/usr/bin/docker stop rbd-target-gw
 {% endif %}
-ExecStartPre=-/snap/bin/docker rm rbd-target-gw
-ExecStart=/snap/bin/docker run --rm \
+ExecStartPre=-/usr/bin/docker rm rbd-target-gw
+ExecStart=/usr/bin/docker run --rm \
 {% if container_binary == 'podman' %}
   -d --log-driver journald --conmon-pidfile /%t/%n-pid --cidfile /%t/%n-cid \
 {% endif %}
@@ -36,9 +36,9 @@ ExecStart=/snap/bin/docker run --rm \
   --name=rbd-target-gw \
   {{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}
 {% if container_binary == 'podman' %}
-ExecStop=-/usr/bin/sh -c "/snap/bin/docker rm -f `cat /%t/%n-cid`"
+ExecStop=-/usr/bin/sh -c "/usr/bin/docker rm -f `cat /%t/%n-cid`"
 {% else %}
-ExecStopPost=-/snap/bin/docker stop rbd-target-gw
+ExecStopPost=-/usr/bin/docker stop rbd-target-gw
 {% endif %}
 KillMode=none
 Restart=always

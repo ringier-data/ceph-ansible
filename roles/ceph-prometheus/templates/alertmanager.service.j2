@@ -1,13 +1,14 @@
 # This file is managed by ansible, don't make changes here - they will be overwritten.
 [Unit]
 Description=alertmanager
-After=network.target
+After=docker.service
+Requires=docker.service
 
 [Service]
 WorkingDirectory={{ alertmanager_data_dir }}
 EnvironmentFile=-/etc/environment
-ExecStartPre=-/bin/sh -c "/snap/bin/docker rm -f alertmanager > /dev/null 2>&1"
-ExecStart=/snap/bin/docker run --rm --name=alertmanager \
+ExecStartPre=-/bin/sh -c "/usr/bin/docker rm -f alertmanager > /dev/null 2>&1"
+ExecStart=/usr/bin/docker run --rm --name=alertmanager \
   -v "{{ alertmanager_conf_dir }}:/etc/alertmanager:Z" \
   -v "{{ alertmanager_data_dir }}:/alertmanager:Z" \
   --net=host \
@@ -24,7 +25,7 @@ ExecStart=/snap/bin/docker run --rm --name=alertmanager \
   --storage.path=/alertmanager \
   --web.external-url=http://{{ ansible_fqdn }}:{{ alertmanager_port }}/ \
   --web.listen-address={{ grafana_server_addr }}:{{ alertmanager_port }}
-ExecStop=/snap/bin/docker stop alertmanager
+ExecStop=/usr/bin/docker stop alertmanager
 KillMode=none
 Restart=always
 RestartSec=10s

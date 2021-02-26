@@ -1,12 +1,13 @@
 # This file is managed by ansible, don't make changes here - they will be overwritten.
 [Unit]
 Description=Node Exporter
-After=network.target
+After=docker.service
+Requires=docker.service
 
 [Service]
 EnvironmentFile=-/etc/environment
-ExecStartPre=-/bin/sh -c "/snap/bin/docker rm -f node-exporter > /dev/null 2>&1"
-ExecStart=/snap/bin/docker run --rm --name=node-exporter \
+ExecStartPre=-/bin/sh -c "/usr/bin/docker rm -f node-exporter > /dev/null 2>&1"
+ExecStart=/usr/bin/docker run --rm --name=node-exporter \
   --privileged \
   -v /proc:/host/proc:ro -v /sys:/host/sys:ro \
   --net=host \
@@ -15,7 +16,7 @@ ExecStart=/snap/bin/docker run --rm --name=node-exporter \
   --path.sysfs=/host/sys \
   --no-collector.timex \
   --web.listen-address=:{{ node_exporter_port }}
-ExecStop=-/snap/bin/docker stop node-exporter
+ExecStop=-/usr/bin/docker stop node-exporter
 KillMode=none
 Restart=always
 RestartSec=10s
