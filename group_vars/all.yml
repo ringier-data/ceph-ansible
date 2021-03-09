@@ -95,7 +95,7 @@ ntp_service_enabled: false
 # This variable determines if ceph packages can be updated.  If False, the
 # package resources will use "state=present".  If True, they will use
 # "state=latest".
-upgrade_ceph_packages: True
+upgrade_ceph_packages: False
 
 ceph_use_distro_backports: true # DEBIAN ONLY
 #ceph_directories_mode: "0755"
