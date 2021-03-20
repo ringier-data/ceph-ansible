@@ -342,8 +342,8 @@ ip_version: ipv4
 #osd_memory_target: 4294967296
 #journal_size: 5120 # OSD journal size in MB
 #block_db_size: -1 # block db size in bytes for the ceph-volume lvm batch. -1 means use the default of 'as big as possible'.
-#public_network: 0.0.0.0/0
-#cluster_network: "{{ public_network | regex_replace(' ', '') }}"
+public_network: "{{ physical_network_cidr }}"
+cluster_network: "{{ public_network }}"
 #osd_mkfs_type: xfs
 #osd_mkfs_options_xfs: -f -i size=2048
 #osd_mount_options_xfs: noatime,largeio,inode64,swalloc
@@ -677,7 +677,7 @@ grafana_admin_password: !vault |
 #grafana_key: ''
 # When using https, please fill with a hostname for which grafana_crt is valid.
 #grafana_server_fqdn: ''
-grafana_container_image: "grafana/grafana:7.4.3"
+grafana_container_image: "grafana/grafana:7.4.5"
 grafana_container_cpu_period: 40000
 grafana_container_cpu_cores: 1
 # container_memory is in GB
@@ -698,6 +698,7 @@ grafana_dashboard_files:
   - osds-overview.json
   - pool-detail.json
   - pool-overview.json
+  - rbd-details.json
   - rbd-overview.json
 grafana_plugins:
   - vonage-status-panel
@@ -705,9 +706,9 @@ grafana_plugins:
 grafana_allow_embedding: True
 #grafana_port: 3000
 #grafana_conf_overrides: {}
-prometheus_container_image: "prom/prometheus:v2.25.0"
+prometheus_container_image: "prom/prometheus:v2.25.2"
 prometheus_container_cpu_period: 80000
-prometheus_container_cpu_cores: 2
+prometheus_container_cpu_cores: 1
 # container_memory is in GB
 prometheus_container_memory: 1
 prometheus_data_dir: /var/lib/prometheus
