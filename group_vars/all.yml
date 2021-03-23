@@ -42,7 +42,7 @@ ceph_release_num:
 mon_group_name: mons
 osd_group_name: osds
 #rgw_group_name: rgws
-#mds_group_name: mdss
+mds_group_name: mdss
 #nfs_group_name: nfss
 #rbdmirror_group_name: rbdmirrors
 #client_group_name: clients
@@ -54,7 +54,7 @@ grafana_server_group_name: grafana-server
 # If configure_firewall is true, then ansible will try to configure the
 # appropriate firewalling rules so that Ceph daemons can communicate
 # with each others.
-#configure_firewall: True
+configure_firewall: False
 
 # Open ports on corresponding nodes if firewall is installed on it
 #ceph_mon_firewall_zone: public
@@ -87,7 +87,7 @@ grafana_server_group_name: grafana-server
 
 # Enable the ntp service by default to avoid clock skew on ceph nodes
 # Disable if an appropriate NTP client is already installed and configured
-ntp_service_enabled: false
+ntp_service_enabled: False
 
 # Set type of NTP client daemon to use, valid entries are chronyd, ntpd or timesyncd
 #ntp_daemon_type: chronyd
@@ -95,9 +95,9 @@ ntp_service_enabled: false
 # This variable determines if ceph packages can be updated.  If False, the
 # package resources will use "state=present".  If True, they will use
 # "state=latest".
-upgrade_ceph_packages: False
+upgrade_ceph_packages: True
 
-ceph_use_distro_backports: true # DEBIAN ONLY
+#ceph_use_distro_backports: false # DEBIAN ONLY
 #ceph_directories_mode: "0755"
 
 ###########
@@ -112,14 +112,14 @@ ceph_use_distro_backports: true # DEBIAN ONLY
 # - 'distro' means that no separate repo file will be added
 #  you will get whatever version of Ceph is included in your Linux distro.
 # 'local' means that the ceph binaries will be copied over from the local machine
-ceph_origin: distro
+ceph_origin: repository
 #valid_ceph_origins:
 #  - repository
 #  - distro
 #  - local
 
 
-#ceph_repository: dummy
+ceph_repository: community
 #valid_ceph_repository:
 #  - community
 #  - rhcs
@@ -133,10 +133,10 @@ ceph_origin: distro
 #
 # Enabled when ceph_repository == 'community'
 #
-#ceph_mirror: http://download.ceph.com
-#ceph_stable_key: https://download.ceph.com/keys/release.asc
-#ceph_stable_release: dummy
-#ceph_stable_repo: "{{ ceph_mirror }}/debian-{{ ceph_stable_release }}"
+ceph_mirror: http://download.ceph.com
+ceph_stable_key: https://download.ceph.com/keys/release.asc
+ceph_stable_release: octopus
+ceph_stable_repo: "{{ ceph_mirror }}/debian-{{ ceph_stable_release }}"
 
 #nfs_ganesha_stable: true # use stable repos for nfs-ganesha
 #nfs_ganesha_stable_branch: V3.3-stable
@@ -252,7 +252,7 @@ ceph_origin: distro
 # Permissions for keyring files in /etc/ceph
 #ceph_keyring_permissions: '0600'
 
-cephx: false
+cephx: False
 
 ## Client options
 #
@@ -325,14 +325,16 @@ ip_version: ipv4
 #  cephfs_data_pool:
 #    name: "{{ cephfs_data if cephfs_data is defined else 'cephfs_data' }}"
 #    target_size_ratio: 0.2
-#cephfs: cephfs # name of the ceph filesystem
-#cephfs_data_pool:
-#  name: "{{ cephfs_data if cephfs_data is defined else 'cephfs_data' }}"
-#cephfs_metadata_pool:
-#  name: "{{ cephfs_metadata if cephfs_metadata is defined else 'cephfs_metadata' }}"
-#cephfs_pools:
-#  - "{{ cephfs_data_pool }}"
-#  - "{{ cephfs_metadata_pool }}"
+cephfs: cephfs # name of the ceph filesystem
+cephfs_data_pool:
+  name: "{{ cephfs_data if cephfs_data is defined else 'cephfs_data' }}"
+  target_size_ratio: 0.2
+cephfs_metadata_pool:
+  name: "{{ cephfs_metadata if cephfs_metadata is defined else 'cephfs_metadata' }}"
+  target_size_ratio: 0.2
+cephfs_pools:
+  - "{{ cephfs_data_pool }}"
+  - "{{ cephfs_metadata_pool }}"
 
 ## OSD options
 #
